@@ -1,4 +1,4 @@
-module bridge::bridge_nft;
+module bridge_nft::bridge_nft;
 
 use std::string::String;
 use sui::package;
