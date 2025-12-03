@@ -1,66 +1,85 @@
-module bridge_nft::collection;
+module bridge_nft::bridge_nft;
 
-use std::string;
+use std::string::String;
+use sui::package;
+use sui::display;
+use sui::event;
 
-public struct Collection has key, store {
+const MINT_SUPPLY: u64 = 1000;
+
+public struct BridgeNFT has key, store {
     id: UID,
-    name: string::String,
-    description: string::String,
-    image_url: string::String,
-    creator: address,
-    max_supply: u64,
-    total_minted: u64,
+    name: String,
+    image_url: String,
 }
 
-public struct NFT has key, store {
+public struct BRIDGE_NFT has drop {}
+
+public struct CollectionCap has key, store {
     id: UID,
-    name: string::String,
-    description: string::String,
-    image_url: string::String,
-    collection_id: ID,
-    serial_number: u64,
+    owner: address,
+    total_supply: u64,
+    minted: u64,
+    allowlist_enabled: bool,
 }
 
-public fun create_collection(
-    name: string::String,
-    description: string::String,
-    image_url: string::String,
-    max_supply: u64,
-    ctx: &mut TxContext,
-): Collection {
-    Collection {
-        id: object::new(ctx),
-        name,
-        description,
-        image_url,
-        creator: tx_context::sender(ctx),
-        max_supply,
-        total_minted: 0,
-    }
+public struct BridgeNFTMinted has copy, drop {
+    object_id: ID,
+    owner: address,
 }
 
-public fun mint_nft(
-    collection: &mut Collection,
-    name: string::String,
-    description: string::String,
-    image_url: string::String,
-    ctx: &mut TxContext,
-) {
-    assert!(tx_context::sender(ctx) == collection.creator, 0);
+fun init(otw: BRIDGE_NFT, ctx: &mut TxContext) {
+    let publisher = package::claim(otw, ctx);
 
-    assert!(collection.total_minted < collection.max_supply, 1);
+    let keys = vector[
+        b"name".to_string(),
+        b"image_url".to_string(),
+        b"description".to_string()
+    ];
+    let values = vector[
+        b"{name}".to_string(),
+        b"{image_url}".to_string(),
+        b"BRIDGE NFT from official collection".to_string()
+    ];
+    let mut display_obj = display::new_with_fields<BridgeNFT>(&publisher, keys, values, ctx);
+    display_obj.update_version();
 
-    let serial_number = collection.total_minted + 1;
-    collection.total_minted = serial_number;
-
-    let nft = NFT {
+    let cap = CollectionCap {
         id: object::new(ctx),
-        name,
-        description,
-        image_url,
-        collection_id: object::uid_to_inner(&collection.id),
-        serial_number,
+        owner: ctx.sender(),
+        total_supply: MINT_SUPPLY,        
+        minted: 0,
+        allowlist_enabled: false
     };
 
-    transfer::public_transfer(nft, tx_context::sender(ctx));
+    transfer::public_transfer(publisher, ctx.sender());
+    transfer::public_transfer(display_obj, ctx.sender());
+    transfer::public_transfer(cap, ctx.sender());
+}
+
+public fun mint(
+    cap_obj: &mut CollectionCap,
+    name: String,
+    image_url: String,
+    receiver: address,
+    ctx: &mut TxContext
+) {
+    assert!(ctx.sender() == cap_obj.owner, 1);
+
+    assert!(cap_obj.minted < cap_obj.total_supply, 2);
+
+    let nft = BridgeNFT {
+        id: object::new(ctx),
+        name,
+        image_url,
+    };
+
+    cap_obj.minted = cap_obj.minted + 1;
+
+    event::emit(BridgeNFTMinted {
+        object_id: object::id(&nft),
+        owner: receiver,
+    });
+
+    transfer::public_transfer<BridgeNFT>(nft, receiver);
 }
