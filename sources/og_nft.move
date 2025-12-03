@@ -1,4 +1,4 @@
-module bridge_nft::bridge_nft;
+module og_nft::og_nft;
 
 use std::string::String;
 use sui::package;
@@ -7,13 +7,13 @@ use sui::event;
 
 const MINT_SUPPLY: u64 = 1000;
 
-public struct BridgeNFT has key, store {
+public struct OGNFT has key, store {
     id: UID,
     name: String,
     image_url: String,
 }
 
-public struct BRIDGE_NFT has drop {}
+public struct OG_NFT has drop {}
 
 public struct CollectionCap has key, store {
     id: UID,
@@ -23,12 +23,12 @@ public struct CollectionCap has key, store {
     allowlist_enabled: bool,
 }
 
-public struct BridgeNFTMinted has copy, drop {
+public struct OGNFTMinted has copy, drop {
     object_id: ID,
     owner: address,
 }
 
-fun init(otw: BRIDGE_NFT, ctx: &mut TxContext) {
+fun init(otw: OG_NFT, ctx: &mut TxContext) {
     let publisher = package::claim(otw, ctx);
 
     let keys = vector[
@@ -39,9 +39,9 @@ fun init(otw: BRIDGE_NFT, ctx: &mut TxContext) {
     let values = vector[
         b"{name}".to_string(),
         b"{image_url}".to_string(),
-        b"BRIDGE NFT from official collection".to_string()
+        b"OG NFT from official collection".to_string()
     ];
-    let mut display_obj = display::new_with_fields<BridgeNFT>(&publisher, keys, values, ctx);
+    let mut display_obj = display::new_with_fields<OGNFT>(&publisher, keys, values, ctx);
     display_obj.update_version();
 
     let cap = CollectionCap {
@@ -68,7 +68,7 @@ public fun mint(
 
     assert!(cap_obj.minted < cap_obj.total_supply, 2);
 
-    let nft = BridgeNFT {
+    let nft = OGNFT {
         id: object::new(ctx),
         name,
         image_url,
@@ -76,10 +76,10 @@ public fun mint(
 
     cap_obj.minted = cap_obj.minted + 1;
 
-    event::emit(BridgeNFTMinted {
+    event::emit(OGNFTMinted {
         object_id: object::id(&nft),
         owner: receiver,
     });
 
-    transfer::public_transfer<BridgeNFT>(nft, receiver);
+    transfer::public_transfer<OGNFT>(nft, receiver);
 }
