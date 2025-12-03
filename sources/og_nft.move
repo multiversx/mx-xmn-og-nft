@@ -83,3 +83,13 @@ public fun mint(
 
     transfer::public_transfer<OGNFT>(nft, receiver);
 }
+
+
+#[test_only]
+public fun create_for_testing(ctx: &mut TxContext): OGNFT {
+    OGNFT {
+        id: object::new(ctx),
+        name: b"Test NFT".to_string(),
+        image_url: b"https://test.com/nft.png".to_string(),
+    }
+}
