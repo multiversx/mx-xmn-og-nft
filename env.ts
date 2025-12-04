@@ -11,11 +11,11 @@ import {
   getKeyPairFromSeed,
 } from "./mx-bridge-typescript/src/utils/crypto";
 import type {
-  BridgeDeploymentInfo,
+  BridgeNftDeploymentInfo,
   WalletScheme,
 } from "./mx-bridge-typescript/src/clients/sui/types";
 import { createClient } from "./mx-bridge-typescript/src/clients/sui/factory";
-import { BridgeClient } from "./mx-bridge-typescript/src/clients/sui/BridgeClient";
+import { BridgeNftClient } from "./mx-bridge-typescript/src/clients/sui/BridgeNftClient";
 
 dotenv.config({ path: path.join(__dirname, ".env") });
 
@@ -106,18 +106,18 @@ export const ADMIN =
     ? getKeyPairFromPvtKey(ENV.DEPLOYER_KEY, ENV.WALLET_SCHEME)
     : getKeyPairFromSeed(ENV.DEPLOYER_PHRASE, ENV.WALLET_SCHEME);
 
-export const DEPLOYMENT = deploymentData as BridgeDeploymentInfo;
+export const DEPLOYMENT = deploymentData as BridgeNftDeploymentInfo;
 
-const deploymentForClient: BridgeDeploymentInfo = DEPLOYMENT?.Package
+const deploymentForClient: BridgeNftDeploymentInfo = DEPLOYMENT?.Package
   ? DEPLOYMENT
   : ({
-      type: "bridge",
+      type: "bridgeOGNFT",
       Package: "",
       Objects: {},
-    } as BridgeDeploymentInfo);
+    } as BridgeNftDeploymentInfo);
 
 export const SUI_CLIENT = createClient(
   CONFIG.rpc,
   deploymentForClient,
   ADMIN
-) as BridgeClient;
+) as BridgeNftClient;

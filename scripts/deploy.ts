@@ -1,5 +1,4 @@
 import path from "path";
-import fs from "fs";
 import { execSync } from "child_process";
 import { ADMIN, SUI_CLIENT, ENV } from "@/env";
 
@@ -60,7 +59,7 @@ export async function main() {
   const createdAt = new Date().toISOString();
 
   const deploymentData = {
-    type: "bridgeToken",
+    type: "bridgeOGNFT",
     id: deploymentId,
     active: false,
     digest: result.digest,
