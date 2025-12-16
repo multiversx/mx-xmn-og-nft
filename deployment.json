@@ -17,6 +17,23 @@
         "Operators": {
           "Admin": "0xeb298a01aef58dce189dbb7d5aa53ea934a14067568ade05b152ab5a8be7df4e"
         }
+      },
+      {
+        "type": "bridgeOGNFT",
+        "id": 2,
+        "active": false,
+        "digest": "7nifAdHmWUTNdoDDrkT3BdyBuyXNyufqhmRB6bzawqdP",
+        "createdAt": "2025-12-16T12:07:52.906Z",
+        "Package": "0xefe673c0ba799afe108d40243611aa59ca516a0831a2b6540d33d9f58a3a5d82",
+        "Objects": {
+          "Display": "0x29a713096269b8974a00e880b682c0493e96184a4250258f9096aa1d3cd0a0bf",
+          "CollectionCap": "0x70f51dfee35f9640158bcce3584c5f19aaccafd2fa1c43a8acf705f1e7b961a4",
+          "UpgradeCap": "0xaf50318b662d46b508d7e2a37c7bb7d4fdb0f7768cdb95e430038f7c48638d55",
+          "Publisher": "0xeaa6740a2df6662caf07a705e6ed8ce9af71bc402b9325f7ea83bd69abebd289"
+        },
+        "Operators": {
+          "Admin": "0xde91225b70964422bbaea44f2b77bf76e962eb7b1607039783bd2af31e96ce74"
+        }
       }
     ]
   },
