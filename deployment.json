@@ -2,42 +2,20 @@
   "testnet": {
     "deployments": [
       {
-        "type": "bridgeToken",
-        "id": 1,
-        "active": false,
-        "digest": "BJiCStAAaes9dVYKLgtoumiYwYqh67m489qwJM6TRtGV",
-        "createdAt": "2025-12-04T11:23:54.466Z",
-        "Package": "0x0a358ce578d135592b064bdae91c9ad2974fde9c187b19dce6fdd73ebb5c40f7",
-        "Objects": {
-          "UpgradeCap": "0x817a3b60f8f863251802d02fbb19a723e37c68563a58438ddf9e83ff421b2fb5",
-          "Display": "0xb690ae57eb765ca19379309e2dd54488a004b5510af8ad05147651e6419472b1",
-          "Publisher": "0xd8d4b3c16e72c6553d2bdb049d433e71b30376ea240c1ab26eefb4db06014447",
-          "CollectionCap": "0xf34341d7b4114ea41f4881cfe2fb60caf07703693fe483b49a4483531e091230"
-        },
-        "Operators": {
-          "Admin": "0x69051698845a1beea0472a234f073fad981e4db72b6690c0970a902e6f548524"
-        }
-      },
-      {
         "type": "bridgeOGNFT",
-        "id": 2,
+        "id": 1,
         "active": true,
-        "digest": "5tbVbzS3ymqiKoLdegJyKmkfvi6WVPs2z5NhVbVy4w94",
+        "digest": "",
         "createdAt": "2025-12-04T11:33:03.634Z",
-        "Package": "0x51ff9bada8529d26fb9be87c434e9a4e3bd87767eb925f5a1df5a4ff943b45da",
+        "Package": "0xb691ff2917099e1c774b27fcc6486622ade93d54e91930effa0f43f68b4a62d9",
         "Objects": {
-          "UpgradeCap": "0x06d86b993d1985f5bb084fda778ac7d700b2a74500fd0cd2ab4ed5ebbfd06156",
-          "Publisher": "0x4e8cf085cbd3477de0cf798620efa4f1e1adef20776b6862f405f08e199dcd50",
-          "CollectionCap": "0xb781ec98ae0dd997ebffc9fdbec7d56e346d78f014e56f8ac0a23e8c4c51856a",
-          "Display": "0xf2f37304daf1f68f12d79bcd80ce890e38abcdb7f72e50b1ccc2a7c3d7b48f1b"
+          "UpgradeCap": "",
+          "Publisher": "0xeb298a01aef58dce189dbb7d5aa53ea934a14067568ade05b152ab5a8be7df4e",
+          "CollectionCap": "0x9b04b635942f31dc6180791d02da91c957bd35dadbf6211b6f28107f431d62ff",
+          "Display": ""
         },
         "Operators": {
-          "Admin": "0x69051698845a1beea0472a234f073fad981e4db72b6690c0970a902e6f548524"
-        },
-        "lastUpgrade": {
-          "previousPackage": "0x6b4f9b935d1d647b1e34fb5c074bad7e3f5c3700f8096957ded99affef3adca0",
-          "upgradedAt": "2025-12-04T11:34:30.711Z",
-          "digest": "AHqBr5uqAbmdMWCTFMtmxyyKCpKWukuzhNG4RcSGunF1"
+          "Admin": "0xeb298a01aef58dce189dbb7d5aa53ea934a14067568ade05b152ab5a8be7df4e"
         }
       }
     ]
