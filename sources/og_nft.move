@@ -6,11 +6,12 @@ use sui::display;
 use sui::event;
 
 // ============== Constants ==============
-const MINT_SUPPLY: u64 = 10000;
+const MINT_SUPPLY: u64 = 5000;
 
 // ============== Error Codes ==============
 const ENotOwner: u64 = 1;
 const ESupplyExceeded: u64 = 2;
+const EInvalidSupply: u64 = 3;
 
 // ============== Structs ==============
 public struct Utility has store, copy, drop {
@@ -125,6 +126,16 @@ public fun mint(
     });
 
     transfer::public_transfer<OGNFT>(nft, receiver);
+}
+
+public fun set_total_supply(
+    collection: &mut CollectionCap,
+    new_supply: u64,
+    ctx: &mut TxContext
+) {
+    assert!(ctx.sender() == collection.owner, ENotOwner);
+    assert!(new_supply >= collection.minted, EInvalidSupply);
+    collection.total_supply = new_supply;
 }
 
 #[test_only]

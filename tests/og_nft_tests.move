@@ -210,3 +210,90 @@ fun test_collection_cap_initial_state() {
     
     ts::end(scenario);
 }
+
+#[test]
+fun test_set_total_supply_success() {
+    let mut scenario = ts::begin(ADMIN);
+    
+    create_collection_cap_for_testing(&mut scenario);
+    
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let mut cap = ts::take_from_sender<CollectionCap>(&scenario);
+        
+        og_nft::set_total_supply(&mut cap, 5000, ts::ctx(&mut scenario));
+        assert!(og_nft::get_total_supply(&cap) == 5000, 0);
+        
+        ts::return_to_sender(&scenario, cap);
+    };
+    
+    ts::end(scenario);
+}
+
+#[test]
+fun test_set_total_supply_increase() {
+    let mut scenario = ts::begin(ADMIN);
+    
+    create_collection_cap_for_testing(&mut scenario);
+    
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let mut cap = ts::take_from_sender<CollectionCap>(&scenario);
+        
+        og_nft::set_total_supply(&mut cap, 20000, ts::ctx(&mut scenario));
+        assert!(og_nft::get_total_supply(&cap) == 20000, 0);
+        
+        ts::return_to_sender(&scenario, cap);
+    };
+    
+    ts::end(scenario);
+}
+
+#[test]
+#[expected_failure]
+fun test_set_total_supply_not_owner_fails() {
+    let mut scenario = ts::begin(ADMIN);
+    
+    create_collection_cap_for_testing(&mut scenario);
+    
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let cap = ts::take_from_sender<CollectionCap>(&scenario);
+        transfer::public_transfer(cap, USER1);
+    };
+    
+    ts::next_tx(&mut scenario, USER1);
+    {
+        let mut cap = ts::take_from_sender<CollectionCap>(&scenario);
+        og_nft::set_total_supply(&mut cap, 5000, ts::ctx(&mut scenario));
+        ts::return_to_sender(&scenario, cap);
+    };
+    
+    ts::end(scenario);
+}
+
+#[test]
+#[expected_failure]
+fun test_set_total_supply_below_minted_fails() {
+    let mut scenario = ts::begin(ADMIN);
+    
+    create_collection_cap_for_testing(&mut scenario);
+    
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let mut cap = ts::take_from_sender<CollectionCap>(&scenario);
+        og_nft::mint(&mut cap, USER1, ts::ctx(&mut scenario));
+        og_nft::mint(&mut cap, USER2, ts::ctx(&mut scenario));
+        assert!(og_nft::get_minted(&cap) == 2, 0);
+        ts::return_to_sender(&scenario, cap);
+    };
+    
+    ts::next_tx(&mut scenario, ADMIN);
+    {
+        let mut cap = ts::take_from_sender<CollectionCap>(&scenario);
+        og_nft::set_total_supply(&mut cap, 1, ts::ctx(&mut scenario));
+        ts::return_to_sender(&scenario, cap);
+    };
+    
+    ts::end(scenario);
+}
