@@ -4,6 +4,7 @@ use std::string::String;
 use sui::package;
 use sui::display;
 use sui::event;
+use og_nft::og_nft_roles;
 
 // ============== Constants ==============
 const MINT_SUPPLY: u64 = 5000;
@@ -40,7 +41,7 @@ public struct OG_NFT has drop {}
 
 public struct CollectionCap has key, store {
     id: UID,
-    owner: address,
+    roles: og_nft_roles::Roles<OG_NFT>,
     total_supply: u64,
     minted: u64,
 }
@@ -53,6 +54,7 @@ public struct OGNFTMinted has copy, drop {
 
 fun init(otw: OG_NFT, ctx: &mut TxContext) {
     let publisher = package::claim(otw, ctx);
+    let roles = og_nft_roles::new<OG_NFT>(ctx.sender(), ctx);
 
     let keys = vector[
         b"name".to_string(),
@@ -74,7 +76,7 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
 
     let cap = CollectionCap {
         id: object::new(ctx),
-        owner: ctx.sender(),
+        roles,
         total_supply: MINT_SUPPLY,        
         minted: 0
     };
@@ -85,12 +87,12 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
 }
 
 public fun mint(
-    collection: &mut CollectionCap,
+    self: &mut CollectionCap,
     receiver: address,
     ctx: &mut TxContext
 ) {
-    assert!(ctx.sender() == collection.owner, ENotOwner);
-    assert!(collection.minted < collection.total_supply, ESupplyExceeded);
+    assert!(ctx.sender() == self.roles.owner(), ENotOwner);
+    assert!(self.minted < self.total_supply, ESupplyExceeded);
 
     let mut attributes = vector::empty<Attribute>();
     vector::push_back(&mut attributes, Attribute { trait_type: b"APR Boost".to_string(), value: b"+2%".to_string() });
@@ -118,7 +120,7 @@ public fun mint(
         utility: utility_data,
     };
 
-    collection.minted = collection.minted + 1;
+    self.minted = self.minted + 1;
 
     event::emit(OGNFTMinted {
         object_id: object::id(&nft),
@@ -133,9 +135,23 @@ public fun set_total_supply(
     new_supply: u64,
     ctx: &mut TxContext
 ) {
-    assert!(ctx.sender() == collection.owner, ENotOwner);
+    assert!(ctx.sender() == collection.roles.owner(), ENotOwner);
     assert!(new_supply >= collection.minted, EInvalidSupply);
     collection.total_supply = new_supply;
+}
+
+public fun transfer_ownership(self: &mut CollectionCap, new_owner: address, ctx: &TxContext) {
+    assert!(self.roles.owner() == ctx.sender(), ENotOwner);
+
+    self.roles.owner_role_mut().begin_role_transfer(new_owner, ctx)
+}
+
+public fun accept_ownership(self: &mut CollectionCap, ctx: &TxContext) {
+    let pending = self.roles.pending_owner();
+
+    assert!(option::is_some(&pending) && option::borrow(&pending) == ctx.sender(), ENotOwner);
+
+    self.roles.owner_role_mut().accept_role(ctx)
 }
 
 #[test_only]
@@ -162,7 +178,7 @@ public fun create_for_testing(ctx: &mut TxContext): OGNFT {
 public fun create_collection_cap_for_testing(ctx: &mut TxContext): CollectionCap {
     CollectionCap {
         id: object::new(ctx),
-        owner: ctx.sender(),
+        roles: og_nft_roles::new<OG_NFT>(ctx.sender(), ctx),
         total_supply: MINT_SUPPLY,
         minted: 0,
     }
@@ -172,7 +188,7 @@ public fun create_collection_cap_for_testing(ctx: &mut TxContext): CollectionCap
 public fun create_collection_cap_with_supply_for_testing(supply: u64, ctx: &mut TxContext): CollectionCap {
     CollectionCap {
         id: object::new(ctx),
-        owner: ctx.sender(),
+        roles: og_nft_roles::new<OG_NFT>(ctx.sender(), ctx),
         total_supply: supply,
         minted: 0,
     }
@@ -180,7 +196,7 @@ public fun create_collection_cap_with_supply_for_testing(supply: u64, ctx: &mut 
 
 // ============== Getter Functions ==============
 public fun get_owner(cap: &CollectionCap): address {
-    cap.owner
+    cap.roles.owner()
 }
 
 public fun get_total_supply(cap: &CollectionCap): u64 {
