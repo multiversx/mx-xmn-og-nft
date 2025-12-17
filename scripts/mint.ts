@@ -39,23 +39,16 @@ async function main() {
   console.log(`\nFound ${receivers.length} receiver(s) to mint to`);
   console.log(`Network: ${ENV.DEPLOY_ON}\n`);
 
-  const baseName = "Bridge OG NFT";
-  const baseUrl = "https://example.com/bridge-og-nft";
-
   let successCount = 0;
   let failCount = 0;
 
   for (let i = 0; i < receivers.length; i++) {
     const receiver = receivers[i];
-    const nftName = `${baseName} #${i + 1}`;
-    const nftImageUrl = `${baseUrl}-${i + 1}.png`;
 
     console.log(`\n[${i + 1}/${receivers.length}] Minting to: ${receiver}`);
-    console.log(`  Name: ${nftName}`);
-    console.log(`  Image URL: ${nftImageUrl}`);
 
     try {
-      const result = await SUI_CLIENT.mint(nftName, nftImageUrl, receiver);
+      const result = await SUI_CLIENT.mint(receiver);
 
       console.log(`Minted to ${receiver} successfully!`);
       console.log(
