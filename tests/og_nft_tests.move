@@ -202,7 +202,7 @@ fun test_collection_cap_initial_state() {
         let cap = ts::take_from_sender<CollectionCap>(&scenario);
         
         assert!(og_nft::get_owner(&cap) == ADMIN, 0);
-        assert!(og_nft::get_total_supply(&cap) == 10000, 1);
+        assert!(og_nft::get_total_supply(&cap) == 5000, 1);
         assert!(og_nft::get_minted(&cap) == 0, 2);
         
         ts::return_to_sender(&scenario, cap);
