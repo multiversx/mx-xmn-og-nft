@@ -4,7 +4,7 @@
       {
         "type": "bridgeOGNFT",
         "id": 1,
-        "active": true,
+        "active": false,
         "digest": "",
         "createdAt": "2025-12-04T11:33:03.634Z",
         "Package": "0xb691ff2917099e1c774b27fcc6486622ade93d54e91930effa0f43f68b4a62d9",
@@ -16,6 +16,80 @@
         },
         "Operators": {
           "Admin": "0xeb298a01aef58dce189dbb7d5aa53ea934a14067568ade05b152ab5a8be7df4e"
+        }
+      },
+      {
+        "type": "bridgeOGNFT",
+        "id": 2,
+        "active": false,
+        "digest": "7nifAdHmWUTNdoDDrkT3BdyBuyXNyufqhmRB6bzawqdP",
+        "createdAt": "2025-12-16T12:07:52.906Z",
+        "Package": "0xefe673c0ba799afe108d40243611aa59ca516a0831a2b6540d33d9f58a3a5d82",
+        "Objects": {
+          "Display": "0x29a713096269b8974a00e880b682c0493e96184a4250258f9096aa1d3cd0a0bf",
+          "CollectionCap": "0x70f51dfee35f9640158bcce3584c5f19aaccafd2fa1c43a8acf705f1e7b961a4",
+          "UpgradeCap": "0xaf50318b662d46b508d7e2a37c7bb7d4fdb0f7768cdb95e430038f7c48638d55",
+          "Publisher": "0xeaa6740a2df6662caf07a705e6ed8ce9af71bc402b9325f7ea83bd69abebd289"
+        },
+        "Operators": {
+          "Admin": "0xde91225b70964422bbaea44f2b77bf76e962eb7b1607039783bd2af31e96ce74"
+        }
+      },
+      {
+        "type": "bridgeOGNFT",
+        "id": 3,
+        "active": false,
+        "digest": "6qEkTiTDcsWqxajGLaDjXjCYF5sUb6qzsFQK6TpcstiH",
+        "createdAt": "2025-12-17T11:28:39.416Z",
+        "Package": "0xf1bbc6465bec38bd9a6c60924216c8d05ecd90bba4c8bf8019728f1cd9ee28de",
+        "OGNFT_type": "0xf1bbc6465bec38bd9a6c60924216c8d05ecd90bba4c8bf8019728f1cd9ee28de::og_nft::OGNFT",
+        "Objects": {
+          "Display": "0x3136c90650dc6563b5c4f57a54bf909fd40d1aa494385952b8e159cedd6c1f3e",
+          "Publisher": "0x332c07c46e253384ed8d843702f0732bf44bba1e9ae933abad4f16453244ba77",
+          "UpgradeCap": "0x423c2c449f35dbea271490ba1fbd11738682bff3292a51bc83f47a19bc0159d0",
+          "CollectionCap": "0x94eadead92dfee757a2ab357f2f212ffb6a436148016e3a24862481d490cdec0",
+          "Field": "0xd46cfd2fad948b8d8b9965631915fb60bbb0b996bfbf4edc24702c307ce1af51"
+        },
+        "Operators": {
+          "Admin": "0xde91225b70964422bbaea44f2b77bf76e962eb7b1607039783bd2af31e96ce74"
+        }
+      },
+      {
+        "type": "bridgeOGNFT",
+        "id": 4,
+        "active": true,
+        "digest": "AYuxkEqoVz3karGfxaZoCp1NLV3KonX2zJUZu93qeNuw",
+        "createdAt": "2025-12-17T11:33:57.368Z",
+        "Package": "0x87e9466fdc54071410ad1b079b153cfe6de2e24c7916412cb718e3dbf767ebb2",
+        "OGNFT_type": "0x87e9466fdc54071410ad1b079b153cfe6de2e24c7916412cb718e3dbf767ebb2::og_nft::OGNFT",
+        "Objects": {
+          "UpgradeCap": "0x08f2aa25b3f491cd0890774b93bc87ccd85ba51d6bfd116ac52b10154a5f02c0",
+          "Field": "0x0c4ca017952c5377bc63af2719a0092046005916545ea8db46609b65833b6212",
+          "Display": "0x8bae69986c2bf2a9e52affd8d091a5db869624d4dd966d24507d70d35972c8d8",
+          "Publisher": "0xa231c6f92a82b64e93a27ee12c06c055dc713c857ff8652d53161859a4abd158",
+          "CollectionCap": "0xe0cb119b569b75d52ead9ce7f1a756a49d03d1a8705d4352b7994bbea04878ec"
+        },
+        "Operators": {
+          "Admin": "0x69051698845a1beea0472a234f073fad981e4db72b6690c0970a902e6f548524"
+        }
+      },
+      {
+        "type": "bridgeOGNFT",
+        "id": 5,
+        "active": false,
+        "digest": "DWbB2uh3XZ8FY7QPKBwjVch1LrJU5RKDuXGdJSrc8hDg",
+        "createdAt": "2025-12-17T11:39:52.849Z",
+        "Package": "0x2638eec333f017e78da38388cb32cd37cb8820c7683177317f8b9b96b3069573",
+        "OGNFT_type": "0x2638eec333f017e78da38388cb32cd37cb8820c7683177317f8b9b96b3069573::og_nft::OGNFT",
+        "Objects": {
+          "Display": "0x24c53f2d649df106abb7b17e2d06246349c037a962f7e93a97d04bda14560a4b",
+          "Publisher": "0x2ba3475673aaec909b24d9b1647270e774e11e14c6a46e4624106c121dbf16be",
+          "Field": "0xbfa3ab7508e65488b35601c938209fedddbd6c4c88b38807e409496d3e4bb958",
+          "CollectionCap": "0xc21b7debb47e7446e86321b663c8950d55847a26e1ca8e07ebd1eda49eca3b2f",
+          "UpgradeCap": "0xc5e0fe7469c0ae4483d121298e8b11f5dacb057211fe587d35375966c38a4637"
+        },
+        "Operators": {
+          "Admin": "0xde91225b70964422bbaea44f2b77bf76e962eb7b1607039783bd2af31e96ce74"
         }
       }
     ]
