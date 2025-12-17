@@ -4,7 +4,7 @@
       {
         "type": "bridgeOGNFT",
         "id": 1,
-        "active": true,
+        "active": false,
         "digest": "",
         "createdAt": "2025-12-04T11:33:03.634Z",
         "Package": "0xb691ff2917099e1c774b27fcc6486622ade93d54e91930effa0f43f68b4a62d9",
@@ -21,7 +21,7 @@
       {
         "type": "bridgeOGNFT",
         "id": 2,
-        "active": false,
+        "active": true,
         "digest": "7nifAdHmWUTNdoDDrkT3BdyBuyXNyufqhmRB6bzawqdP",
         "createdAt": "2025-12-16T12:07:52.906Z",
         "Package": "0xefe673c0ba799afe108d40243611aa59ca516a0831a2b6540d33d9f58a3a5d82",

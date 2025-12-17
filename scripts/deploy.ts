@@ -119,6 +119,7 @@ export async function main() {
     digest: result.digest,
     createdAt,
     Package: Package || undefined,
+    OGNFT_type: `${Package}::og_nft::OGNFT`,
     Objects: restObjects,
     Operators: { Admin: deployerAddress },
   };
