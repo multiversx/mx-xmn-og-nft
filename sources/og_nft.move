@@ -4,8 +4,10 @@ use std::string::String;
 use sui::package;
 use sui::display;
 use sui::event;
+use og_nft::og_nft_roles;
 
 const MINT_SUPPLY: u64 = 1000;
+const ENotOwner: u64 = 0;
 
 public struct OGNFT has key, store {
     id: UID,
@@ -17,7 +19,7 @@ public struct OG_NFT has drop {}
 
 public struct CollectionCap has key, store {
     id: UID,
-    owner: address,
+    roles: og_nft_roles::Roles<OG_NFT>,
     total_supply: u64,
     minted: u64,
     allowlist_enabled: bool,
@@ -30,6 +32,7 @@ public struct OGNFTMinted has copy, drop {
 
 fun init(otw: OG_NFT, ctx: &mut TxContext) {
     let publisher = package::claim(otw, ctx);
+    let roles = og_nft_roles::new<OG_NFT>(ctx.sender(), ctx);
 
     let keys = vector[
         b"name".to_string(),
@@ -46,7 +49,7 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
 
     let cap = CollectionCap {
         id: object::new(ctx),
-        owner: ctx.sender(),
+        roles,
         total_supply: MINT_SUPPLY,        
         minted: 0,
         allowlist_enabled: false
@@ -58,15 +61,15 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
 }
 
 public fun mint(
-    cap_obj: &mut CollectionCap,
+    self: &mut CollectionCap,
     name: String,
     image_url: String,
     receiver: address,
     ctx: &mut TxContext
 ) {
-    assert!(ctx.sender() == cap_obj.owner, 1);
+    assert!(self.roles.owner() == ctx.sender(), ENotOwner);
 
-    assert!(cap_obj.minted < cap_obj.total_supply, 2);
+    assert!(self.minted < self.total_supply, 2);
 
     let nft = OGNFT {
         id: object::new(ctx),
@@ -74,7 +77,7 @@ public fun mint(
         image_url,
     };
 
-    cap_obj.minted = cap_obj.minted + 1;
+    self.minted = self.minted + 1;
 
     event::emit(OGNFTMinted {
         object_id: object::id(&nft),
@@ -82,6 +85,20 @@ public fun mint(
     });
 
     transfer::public_transfer<OGNFT>(nft, receiver);
+}
+
+public fun transfer_ownership(self: &mut CollectionCap, new_owner: address, ctx: &TxContext) {
+    assert!(self.roles.owner() == ctx.sender(), ENotOwner);
+
+    self.roles.owner_role_mut().begin_role_transfer(new_owner, ctx)
+}
+
+public fun accept_ownership(self: &mut CollectionCap, ctx: &TxContext) {
+    let pending = self.roles.pending_owner();
+
+    assert!(option::is_some(&pending) && option::borrow(&pending) == ctx.sender(), ENotOwner);
+
+    self.roles.owner_role_mut().accept_role(ctx)
 }
 
 #[test_only]
