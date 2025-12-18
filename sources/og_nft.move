@@ -65,7 +65,7 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
     ];
     let values = vector[
         b"{name}".to_string(),
-        b"https://project-url.com".to_string(),
+        b"https://www.xmoney.com".to_string(),
         b"{image_url}".to_string(),
         b"{description}".to_string(),
         b"XMoney Team".to_string(),
@@ -115,7 +115,7 @@ public fun mint(
         name: b"XMN APR Boost NFT".to_string(),
         symbol: b"XMNBOOST".to_string(),
         description: b"The XMN APR Boost NFT grants its holder a permanent +2% APR increase on XMN staking rewards. Designed for long-term supporters of the XMN ecosystem, this NFT unlocks enhanced staking yields and exclusive benefits across the protocol.".to_string(),
-        image_url: b"ipfs://image-cid".to_string(), 
+        image_url: b"https://ipfs.io/ipfs/bafybeifhunxvdl2lylrly2kjpqwchjtyqyyakpstkgsqi7cr6a367jbkfe".to_string(), 
         attributes: attributes,
         utility: utility_data,
     };
