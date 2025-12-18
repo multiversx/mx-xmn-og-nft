@@ -7,7 +7,7 @@ use sui::event;
 use og_nft::og_nft_roles;
 
 // ============== Constants ==============
-const MINT_SUPPLY: u64 = 5000;
+const MINT_SUPPLY: u64 = 1000;
 
 // ============== Error Codes ==============
 const ENotOwner: u64 = 1;
@@ -65,7 +65,7 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
     ];
     let values = vector[
         b"{name}".to_string(),
-        b"https://www.xmoney.com".to_string(),
+        b"https://stake.xmoney.com".to_string(),
         b"{image_url}".to_string(),
         b"{description}".to_string(),
         b"XMoney Team".to_string(),
@@ -99,7 +99,7 @@ public fun mint(
     vector::push_back(&mut attributes, Attribute { trait_type: b"Utility".to_string(), value: b"Staking Boost".to_string() });
     vector::push_back(&mut attributes, Attribute { trait_type: b"Token".to_string(), value: b"XMN".to_string() });
     vector::push_back(&mut attributes, Attribute { trait_type: b"Network".to_string(), value: b"Sui".to_string() });
-    vector::push_back(&mut attributes, Attribute { trait_type: b"Boost Type".to_string(), value: b"Permanent While Held".to_string() });
+    vector::push_back(&mut attributes, Attribute { trait_type: b"Boost Type".to_string(), value: b"Permanent While Staked".to_string() });
     vector::push_back(&mut attributes, Attribute { trait_type: b"Transferability".to_string(), value: b"Transferable".to_string() });
     vector::push_back(&mut attributes, Attribute { trait_type: b"Version".to_string(), value: b"V1".to_string() });
 
