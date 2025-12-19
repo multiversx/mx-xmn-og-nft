@@ -65,96 +65,89 @@ function updateMoveLock(
   console.log(`Updated Move.lock: fresh deployment, package ${packageId}`);
 }
 
-if (require.main === module) {
-  run(async () => {
-    const deployerAddress = ADMIN.getPublicKey().toSuiAddress();
-    console.log(`Deployer: ${deployerAddress}`);
+run(async () => {
+  const deployerAddress = ADMIN.getPublicKey().toSuiAddress();
+  console.log(`Deployer: ${deployerAddress}`);
 
-    const pkgPath = path.join(path.resolve(__dirname), "../");
+  const pkgPath = path.join(path.resolve(__dirname), "../");
 
-    const { modules, dependencies } = JSON.parse(
-      execSync(
-        `sui move build --with-unpublished-dependencies --dump-bytecode-as-base64 --path ${pkgPath}`,
-        {
-          encoding: "utf-8",
-        }
-      )
-    );
+  const { modules, dependencies } = JSON.parse(
+    execSync(
+      `sui move build --with-unpublished-dependencies --dump-bytecode-as-base64 --path ${pkgPath}`,
+      {
+        encoding: "utf-8",
+      }
+    )
+  );
 
-    const tx = newTransactionBlock();
-    const [upgradeCap] = tx.publish({ modules, dependencies });
+  const tx = newTransactionBlock();
+  const [upgradeCap] = tx.publish({ modules, dependencies });
 
-    tx.transferObjects([upgradeCap], tx.pure.address(deployerAddress));
+  tx.transferObjects([upgradeCap], tx.pure.address(deployerAddress));
 
-    console.log("Deploying");
-    await sleep(3000);
+  console.log("Deploying");
+  await sleep(3000);
 
-    const result = await SUI_CLIENT.sendTransactionReturnResult(tx);
+  const result = await SUI_CLIENT.sendTransactionReturnResult(tx);
 
-    await sleep(3000);
+  await sleep(3000);
 
-    console.log("Transaction digest:", result.digest);
-    console.log(
-      `View transaction: https://suiscan.xyz/${ENV.DEPLOY_ON}/tx/${result.digest}`
-    );
+  console.log("Transaction digest:", result.digest);
+  console.log(
+    `View transaction: https://suiscan.xyz/${ENV.DEPLOY_ON}/tx/${result.digest}`
+  );
 
-    console.log("Saving deployment data...");
+  console.log("Saving deployment data...");
 
-    const objects = getCreatedObjectsIDs(result);
+  const objects = getCreatedObjectsIDs(result);
 
-    const filePath = path.join(path.resolve(__dirname), "../deployment.json");
-    const allDeployments = readJSONFile(filePath);
+  const filePath = path.join(path.resolve(__dirname), "../deployment.json");
+  const allDeployments = readJSONFile(filePath);
 
-    const { Package, ...restObjects } = objects;
+  const { Package, ...restObjects } = objects;
 
-    const existingDeployments =
-      allDeployments[ENV.DEPLOY_ON]?.deployments || [];
-    const deploymentId =
-      existingDeployments.length > 0
-        ? Math.max(...existingDeployments.map((d: any) => d.id)) + 1
-        : 1;
-    const createdAt = new Date().toISOString();
+  const existingDeployments = allDeployments[ENV.DEPLOY_ON]?.deployments || [];
+  const deploymentId =
+    existingDeployments.length > 0
+      ? Math.max(...existingDeployments.map((d: any) => d.id)) + 1
+      : 1;
+  const createdAt = new Date().toISOString();
 
-    const deploymentData = {
-      type: "bridgeOGNFT",
-      id: deploymentId,
-      active: false,
-      digest: result.digest,
-      createdAt,
-      Package: Package || undefined,
-      OGNFT_type: `${Package}::og_nft::OGNFT`,
-      Objects: restObjects,
-      Operators: { Admin: deployerAddress },
-    };
+  const deploymentData = {
+    type: "bridgeOGNFT",
+    id: deploymentId,
+    active: false,
+    digest: result.digest,
+    createdAt,
+    Package: Package || undefined,
+    OGNFT_type: `${Package}::og_nft::OGNFT`,
+    Objects: restObjects,
+    Operators: { Admin: deployerAddress },
+  };
 
-    if (!allDeployments[ENV.DEPLOY_ON]) {
-      allDeployments[ENV.DEPLOY_ON] = { deployments: [] };
-    }
-    if (!allDeployments[ENV.DEPLOY_ON].deployments) {
-      allDeployments[ENV.DEPLOY_ON].deployments = [];
-    }
+  if (!allDeployments[ENV.DEPLOY_ON]) {
+    allDeployments[ENV.DEPLOY_ON] = { deployments: [] };
+  }
+  if (!allDeployments[ENV.DEPLOY_ON].deployments) {
+    allDeployments[ENV.DEPLOY_ON].deployments = [];
+  }
 
-    allDeployments[ENV.DEPLOY_ON].deployments.push(deploymentData);
+  allDeployments[ENV.DEPLOY_ON].deployments.push(deploymentData);
 
-    writeJSONFile(allDeployments, filePath);
+  writeJSONFile(allDeployments, filePath);
 
-    if (Package && ENV.DEPLOY_ON) {
-      updateMoveLock(pkgPath, ENV.DEPLOY_ON, Package);
-    }
+  if (Package && ENV.DEPLOY_ON) {
+    updateMoveLock(pkgPath, ENV.DEPLOY_ON, Package);
+  }
 
-    console.log("\nDEPLOYMENT SUCCESSFUL");
-    console.log(`Deployment ID: ${deploymentId}`);
-    console.log(`Network: ${ENV.DEPLOY_ON}`);
-    console.log(`Created: ${new Date(createdAt).toLocaleString()}`);
-    console.log(`Package: ${Package || "N/A"}`);
+  console.log("\nDEPLOYMENT SUCCESSFUL");
+  console.log(`Deployment ID: ${deploymentId}`);
+  console.log(`Network: ${ENV.DEPLOY_ON}`);
+  console.log(`Created: ${new Date(createdAt).toLocaleString()}`);
+  console.log(`Package: ${Package || "N/A"}`);
 
-    console.log("\nDeployment saved to:", filePath);
+  console.log("\nDeployment saved to:", filePath);
 
-    console.log(
-      `\nTo make this deployment active, run the following command:\n`
-    );
-    console.log(
-      `DEPLOYMENT_ID=${deploymentId} npx tsx scripts/mark-active.ts\n`
-    );
-  });
-}
+  console.log(`\nTo make this deployment active, run the following command:\n`);
+  console.log(`DEPLOYMENT_ID=${deploymentId} npx tsx scripts/mark-active.ts\n`);
+});

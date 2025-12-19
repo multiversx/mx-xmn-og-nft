@@ -86,9 +86,8 @@ function updateMoveLockForUpgrade(
  * Upgrade the package for the current deployment
  * Usage: DEPLOYMENT_ID=2 npx tsx scripts/upgrade.ts
  */
-if (require.main === module) {
-  run(async () => {
-    const deployerAddress = ADMIN.getPublicKey().toSuiAddress();
+run(async () => {
+  const deployerAddress = ADMIN.getPublicKey().toSuiAddress();
     console.log(`Deployer: ${deployerAddress}`);
 
     if (!DEPLOYMENT.Objects?.UpgradeCap) {
