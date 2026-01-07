@@ -1,12 +1,13 @@
 import path from "path";
 import { ADMIN, DEPLOYMENT, ENV, SUI_CLIENT } from "@/env";
 import { readJSONFile, sleep } from "@/mx-bridge-typescript/src/utils";
+import { run } from "./runner";
 
 /// --- PARAMS ---
 const NUM_MINTS = 5;
 /// --------------
 
-async function main() {
+run(async () => {
   const deployerAddress = ADMIN.getPublicKey().toSuiAddress();
   console.log(`Deployer: ${deployerAddress}`);
 
@@ -75,11 +76,4 @@ async function main() {
   console.log(`Total: ${NUM_MINTS}`);
   console.log(`Success: ${successCount}`);
   console.log(`Failed: ${failCount}`);
-}
-
-if (require.main === module) {
-  main().catch((error) => {
-    console.error("Error:", error);
-    process.exit(1);
-  });
-}
+});

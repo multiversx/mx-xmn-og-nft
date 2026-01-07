@@ -1,11 +1,12 @@
 import { ADMIN, DEPLOYMENT, ENV, SUI_CLIENT } from "@/env";
+import { run } from "./runner";
 
 /// --- PARAMS ---
 const NEW_OWNER =
   "0x69051698845a1beea0472a234f073fad981e4db72b6690c0970a902e6f548524";
 /// --------------
 
-async function main() {
+run(async () => {
   const deployerAddress = ADMIN.getPublicKey().toSuiAddress();
   console.log(`Current owner: ${deployerAddress}`);
 
@@ -43,11 +44,4 @@ async function main() {
     console.error(`Failed to transfer ownership:`, error);
     process.exit(1);
   }
-}
-
-if (require.main === module) {
-  main().catch((error) => {
-    console.error("Error:", error);
-    process.exit(1);
-  });
-}
+});
