@@ -7,6 +7,7 @@ use sui::event;
 use og_nft::og_nft_roles;
 use sui::vec_map::{Self, VecMap};
 use sui::transfer_policy;
+use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
 
 // ============== Constants ==============
 const MINT_SUPPLY: u64 = 1000;
@@ -88,7 +89,9 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
 
 public fun mint(
     self: &mut CollectionCap,
-    receiver: address,
+    kiosk: &mut Kiosk,
+    kiosk_cap: &KioskOwnerCap,
+    policy: &transfer_policy::TransferPolicy<OGNFT>,
     ctx: &mut TxContext
 ) {
     assert!(ctx.sender() == self.roles.owner(), ENotOwner);
@@ -119,14 +122,16 @@ public fun mint(
         attributes: attributes,
     };
 
+    let nft_id = object::id(&nft);
     self.minted = self.minted + 1;
 
     event::emit(OGNFTMinted {
-        object_id: object::id(&nft),
-        owner: receiver,
+        object_id: nft_id,
+        owner: kiosk::owner(kiosk),
     });
 
-    transfer::public_transfer<OGNFT>(nft, receiver);
+    // Place NFT in kiosk and lock it for TradePort compatibility
+    kiosk::lock(kiosk, kiosk_cap, policy, nft);
 }
 
 public fun set_total_supply(
