@@ -7,7 +7,7 @@ use sui::event;
 use og_nft::og_nft_roles;
 use sui::vec_map::{Self, VecMap};
 use sui::transfer_policy;
-use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
+use sui::kiosk::{Self};
 
 // ============== Constants ==============
 const MINT_SUPPLY: u64 = 1000;
@@ -42,6 +42,7 @@ public struct OGNFTMinted has copy, drop {
     owner: address,
 }
 
+#[allow(lint(share_owned))]
 fun init(otw: OG_NFT, ctx: &mut TxContext) {
     let publisher = package::claim(otw, ctx);
     let roles = og_nft_roles::new<OG_NFT>(ctx.sender(), ctx);
@@ -70,7 +71,6 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
     let mut display_obj = display::new_with_fields<OGNFT>(&publisher, keys, values, ctx);
     display_obj.update_version();
 
-    // Create TransferPolicy for royalty enforcement
     let (transfer_policy, policy_cap) = transfer_policy::new<OGNFT>(&publisher, ctx);
 
     let cap = CollectionCap {
@@ -89,9 +89,7 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
 
 public fun mint(
     self: &mut CollectionCap,
-    kiosk: &mut Kiosk,
-    kiosk_cap: &KioskOwnerCap,
-    policy: &transfer_policy::TransferPolicy<OGNFT>,
+    receiver: address,
     ctx: &mut TxContext
 ) {
     assert!(ctx.sender() == self.roles.owner(), ENotOwner);
@@ -125,13 +123,17 @@ public fun mint(
     let nft_id = object::id(&nft);
     self.minted = self.minted + 1;
 
+    let (mut kiosk, kiosk_cap) = kiosk::new(ctx);
+
+    kiosk::place(&mut kiosk, &kiosk_cap, nft);
+
     event::emit(OGNFTMinted {
         object_id: nft_id,
-        owner: kiosk::owner(kiosk),
+        owner: receiver,
     });
 
-    // Place NFT in kiosk and lock it for TradePort compatibility
-    kiosk::lock(kiosk, kiosk_cap, policy, nft);
+    transfer::public_share_object(kiosk);
+    transfer::public_transfer(kiosk_cap, receiver);
 }
 
 public fun set_total_supply(
