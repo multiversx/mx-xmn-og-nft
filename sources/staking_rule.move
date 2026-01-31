@@ -7,56 +7,39 @@ use sui::transfer_policy::{
     TransferRequest
 };
 
-const EUnauthorizedStakingContract: u64 = 1;
+// ============== Structs ==============
 
-public struct StakingConfig has store, drop {
-    staking_contract: address,
+public struct StakingCap has key, store {
+    id: UID,
 }
 
 public struct Rule has drop {}
 
+// ============== Public Functions ==============
+
+public fun new_staking_cap(ctx: &mut TxContext): StakingCap {
+    StakingCap {
+        id: object::new(ctx),
+    }
+}
+
 public fun add<T>(
     policy: &mut TransferPolicy<T>,
     cap: &TransferPolicyCap<T>,
-    staking_contract: address,
 ) {
-    let config = StakingConfig { staking_contract };
-    transfer_policy::add_rule(Rule {}, policy, cap, config);
+    transfer_policy::add_rule(Rule {}, policy, cap, true);
 }
 
 public fun remove<T>(
     policy: &mut TransferPolicy<T>,
     cap: &TransferPolicyCap<T>,
 ) {
-    transfer_policy::remove_rule<T, Rule, StakingConfig>(policy, cap);
+    transfer_policy::remove_rule<T, Rule, bool>(policy, cap);
 }
 
 public fun prove<T>(
-    policy: &TransferPolicy<T>,
+    _cap: &StakingCap,  // Proof of authorization
     request: &mut TransferRequest<T>,
-    ctx: &TxContext
 ) {
-    let config: &StakingConfig = transfer_policy::get_rule(Rule {}, policy);
-
-    if (ctx.sender() == config.staking_contract) {
-        transfer_policy::add_receipt(Rule {}, request);
-        return
-    };
-
-}
-
-public fun update_staking_contract<T>(
-    policy: &mut TransferPolicy<T>,
-    cap: &TransferPolicyCap<T>,
-    new_staking_contract: address,
-) {
-    let config = StakingConfig { staking_contract: new_staking_contract };
-    transfer_policy::add_rule(Rule {}, policy, cap, config);
-}
-
-public fun get_staking_contract<T>(
-    policy: &TransferPolicy<T>,
-): address {
-    let config: &StakingConfig = transfer_policy::get_rule(Rule {}, policy);
-    config.staking_contract
+    transfer_policy::add_receipt(Rule {}, request);
 }

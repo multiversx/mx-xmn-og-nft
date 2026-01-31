@@ -8,6 +8,8 @@ use og_nft::og_nft_roles;
 use sui::vec_map::{Self, VecMap};
 use sui::transfer_policy;
 use sui::kiosk::{Self};
+use og_nft::staking_rule;
+use kiosk::personal_kiosk;
 
 // ============== Constants ==============
 const MINT_SUPPLY: u64 = 1000;
@@ -80,11 +82,15 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
         minted: 0
     };
 
+    // Create StakingCap for authorizing staking operations
+    let staking_cap = staking_rule::new_staking_cap(ctx);
+
     transfer::public_transfer(publisher, ctx.sender());
     transfer::public_transfer(display_obj, ctx.sender());
     transfer::public_share_object(transfer_policy);
     transfer::public_transfer(policy_cap, ctx.sender());
     transfer::public_transfer(cap, ctx.sender());
+    transfer::public_transfer(staking_cap, ctx.sender());
 }
 
 public fun mint(
@@ -127,13 +133,14 @@ public fun mint(
 
     kiosk::place(&mut kiosk, &kiosk_cap, nft);
 
+    personal_kiosk::create_for(&mut kiosk, kiosk_cap, receiver, ctx);
+
     event::emit(OGNFTMinted {
         object_id: nft_id,
         owner: receiver,
     });
 
     transfer::public_share_object(kiosk);
-    transfer::public_transfer(kiosk_cap, receiver);
 }
 
 public fun set_total_supply(
