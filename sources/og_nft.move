@@ -9,6 +9,9 @@ use sui::vec_map::{Self, VecMap};
 use sui::transfer_policy;
 use sui::kiosk::{Self};
 use kiosk::personal_kiosk;
+use kiosk::kiosk_lock_rule;
+use kiosk::royalty_rule;
+use og_nft::staking_rule;
 
 // ============== Constants ==============
 const MINT_SUPPLY: u64 = 1000;
@@ -72,7 +75,12 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
     let mut display_obj = display::new_with_fields<OGNFT>(&publisher, keys, values, ctx);
     display_obj.update_version();
 
-    let (transfer_policy, policy_cap) = transfer_policy::new<OGNFT>(&publisher, ctx);
+    let (mut transfer_policy, policy_cap) = transfer_policy::new<OGNFT>(&publisher, ctx);
+    staking_rule::add(&mut transfer_policy, &policy_cap);
+
+    kiosk_lock_rule::add(&mut transfer_policy, &policy_cap);
+
+    royalty_rule::add(&mut transfer_policy, &policy_cap, 500, 0);
 
     let cap = CollectionCap {
         id: object::new(ctx),
