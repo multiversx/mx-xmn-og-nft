@@ -77,7 +77,6 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
     let (mut transfer_policy, policy_cap) = transfer_policy::new<OGNFT>(&publisher, ctx);
 
     kiosk_lock_rule::add(&mut transfer_policy, &policy_cap);
-
     royalty_rule::add(&mut transfer_policy, &policy_cap, 500, 0);
 
     let cap = CollectionCap {
@@ -131,9 +130,7 @@ public fun mint(
     self.minted = self.minted + 1;
 
     let (mut kiosk, kiosk_cap) = kiosk::new(ctx);
-
     kiosk::place(&mut kiosk, &kiosk_cap, nft);
-
     personal_kiosk::create_for(&mut kiosk, kiosk_cap, receiver, ctx);
 
     event::emit(OGNFTMinted {
