@@ -11,7 +11,6 @@ use sui::kiosk::{Self};
 use kiosk::personal_kiosk;
 use kiosk::kiosk_lock_rule;
 use kiosk::royalty_rule;
-use og_nft::staking_rule;
 
 // ============== Constants ==============
 const MINT_SUPPLY: u64 = 1000;
@@ -76,7 +75,6 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
     display_obj.update_version();
 
     let (mut transfer_policy, policy_cap) = transfer_policy::new<OGNFT>(&publisher, ctx);
-    staking_rule::add(&mut transfer_policy, &policy_cap);
 
     kiosk_lock_rule::add(&mut transfer_policy, &policy_cap);
 
