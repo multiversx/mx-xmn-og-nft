@@ -8,7 +8,6 @@ use og_nft::og_nft_roles;
 use sui::vec_map::{Self, VecMap};
 use sui::transfer_policy;
 use sui::kiosk::{Self};
-use og_nft::staking_rule;
 use kiosk::personal_kiosk;
 
 // ============== Constants ==============
@@ -82,15 +81,11 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
         minted: 0
     };
 
-    // Create StakingCap for authorizing staking operations
-    let staking_cap = staking_rule::new_staking_cap(ctx);
-
     transfer::public_transfer(publisher, ctx.sender());
     transfer::public_transfer(display_obj, ctx.sender());
     transfer::public_share_object(transfer_policy);
     transfer::public_transfer(policy_cap, ctx.sender());
     transfer::public_transfer(cap, ctx.sender());
-    transfer::public_transfer(staking_cap, ctx.sender());
 }
 
 public fun mint(

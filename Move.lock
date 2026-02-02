@@ -2,10 +2,11 @@
 
 [move]
 version = 3
-manifest_digest = "04357BFB0721A126DE48022E2A8004508670255EA0BE303B1822FF8CAADB43F9"
-deps_digest = "397E6A9F7A624706DBDFEE056CE88391A15876868FD18A88504DA74EB458D697"
+manifest_digest = "0E2F30A6A738C84FDBE3865D2B9F8F359EEEAA7BE8F319BAFBDA4F30A08F1275"
+deps_digest = "52B406A7A21811BEF51751CF88DA0E76DAEFFEAC888D4F4060B1A72BBE7D8D35"
 dependencies = [
   { id = "Bridge", name = "Bridge" },
+  { id = "Kiosk", name = "Kiosk" },
   { id = "MoveStdlib", name = "MoveStdlib" },
   { id = "Sui", name = "Sui" },
   { id = "SuiSystem", name = "SuiSystem" },
@@ -20,6 +21,14 @@ dependencies = [
   { id = "MoveStdlib", name = "MoveStdlib" },
   { id = "Sui", name = "Sui" },
   { id = "SuiSystem", name = "SuiSystem" },
+]
+
+[[move.package]]
+id = "Kiosk"
+source = { git = "https://github.com/MystenLabs/apps.git", rev = "main", subdir = "kiosk" }
+
+dependencies = [
+  { id = "Sui", name = "Sui" },
 ]
 
 [[move.package]]

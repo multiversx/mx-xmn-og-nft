@@ -9,18 +9,34 @@ use sui::transfer_policy::{
 
 // ============== Structs ==============
 
+public struct AdminCap has key, store {
+    id: UID,
+}
+
 public struct StakingCap has key, store {
     id: UID,
 }
 
 public struct Rule has drop {}
 
+fun init(ctx: &mut TxContext) {
+    transfer::transfer(
+        AdminCap { id: object::new(ctx) },
+        ctx.sender()
+    );
+}
+
 // ============== Public Functions ==============
 
-public fun new_staking_cap(ctx: &mut TxContext): StakingCap {
-    StakingCap {
-        id: object::new(ctx),
-    }
+#[allow(lint(self_transfer))]
+public fun new_staking_cap(
+    _admin: &AdminCap,  
+    ctx: &mut TxContext
+) {
+    transfer::transfer(
+        StakingCap { id: object::new(ctx) },
+        ctx.sender()
+    );
 }
 
 public fun add<T>(
