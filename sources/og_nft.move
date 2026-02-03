@@ -97,7 +97,7 @@ public fun mint(
     self: &mut CollectionCap,
     receiver: address,
     ctx: &mut TxContext
-) {
+): ID {
     assert!(ctx.sender() == self.roles.owner(), ENotOwner);
     assert!(self.minted < self.total_supply, ESupplyExceeded);
 
@@ -139,6 +139,8 @@ public fun mint(
     });
 
     transfer::public_share_object(kiosk);
+
+    nft_id
 }
 
 public fun set_total_supply(

@@ -4,6 +4,8 @@ module og_nft::og_nft_tests;
 use sui::test_scenario::{Self as ts, Scenario};
 use og_nft::og_nft::{Self, CollectionCap, OGNFT};
 use sui::vec_map;
+use sui::kiosk::Kiosk;
+use kiosk::personal_kiosk::{Self, PersonalKioskCap};
 
 const ADMIN: address = @0xAD;
 const USER1: address = @0xB1;
@@ -25,29 +27,34 @@ fun create_collection_cap_for_testing(scenario: &mut Scenario) {
 #[test]
 fun test_mint_success() {
     let mut scenario = ts::begin(ADMIN);
-    
+
     create_collection_cap_for_testing(&mut scenario);
-    
+
+    let nft_id;
     ts::next_tx(&mut scenario, ADMIN);
     {
         let mut cap = ts::take_from_sender<CollectionCap>(&scenario);
-        og_nft::mint(&mut cap, USER1, ts::ctx(&mut scenario));
-        
+        nft_id = og_nft::mint(&mut cap, USER1, ts::ctx(&mut scenario));
+
         assert!(og_nft::get_minted(&cap) == 1, 0);
-        
+
         ts::return_to_sender(&scenario, cap);
     };
-    
+
     ts::next_tx(&mut scenario, USER1);
     {
-        let nft = ts::take_from_sender<OGNFT>(&scenario);
-        
-        assert!(og_nft::get_name(&nft) == b"XMN APR Boost NFT".to_string(), 1);
-        assert!(og_nft::get_symbol(&nft) == b"XMNBOOST".to_string(), 2);
-        
-        ts::return_to_sender(&scenario, nft);
+        let kiosk = ts::take_shared<Kiosk>(&scenario);
+        let personal_cap = ts::take_from_sender<PersonalKioskCap>(&scenario);
+        let cap_ref = personal_kiosk::borrow(&personal_cap);
+        let nft = sui::kiosk::borrow<OGNFT>(&kiosk, cap_ref, nft_id);
+
+        assert!(og_nft::get_name(nft) == b"XMN APR Boost NFT".to_string(), 1);
+        assert!(og_nft::get_symbol(nft) == b"XMNBOOST".to_string(), 2);
+
+        ts::return_to_sender(&scenario, personal_cap);
+        ts::return_shared(kiosk);
     };
-    
+
     ts::end(scenario);
 }
 
@@ -75,12 +82,12 @@ fun test_mint_multiple() {
     
     ts::next_tx(&mut scenario, USER1);
     {
-        assert!(ts::has_most_recent_for_sender<OGNFT>(&scenario), 2);
+        assert!(ts::has_most_recent_for_sender<PersonalKioskCap>(&scenario), 2);
     };
-    
+
     ts::next_tx(&mut scenario, USER2);
     {
-        assert!(ts::has_most_recent_for_sender<OGNFT>(&scenario), 3);
+        assert!(ts::has_most_recent_for_sender<PersonalKioskCap>(&scenario), 3);
     };
     
     ts::end(scenario);
@@ -144,25 +151,30 @@ fun test_nft_attributes() {
 
     create_collection_cap_for_testing(&mut scenario);
 
+    let nft_id;
     ts::next_tx(&mut scenario, ADMIN);
     {
         let mut cap = ts::take_from_sender<CollectionCap>(&scenario);
-        og_nft::mint(&mut cap, USER1, ts::ctx(&mut scenario));
+        nft_id = og_nft::mint(&mut cap, USER1, ts::ctx(&mut scenario));
         ts::return_to_sender(&scenario, cap);
     };
 
     ts::next_tx(&mut scenario, USER1);
     {
-        let nft = ts::take_from_sender<OGNFT>(&scenario);
+        let kiosk = ts::take_shared<Kiosk>(&scenario);
+        let personal_cap = ts::take_from_sender<PersonalKioskCap>(&scenario);
+        let cap_ref = personal_kiosk::borrow(&personal_cap);
+        let nft = sui::kiosk::borrow<OGNFT>(&kiosk, cap_ref, nft_id);
 
-        let attrs = og_nft::get_attributes(&nft);
+        let attrs = og_nft::get_attributes(nft);
         assert!(vec_map::length(attrs) == 11, 0);
 
         assert!(vec_map::contains(attrs, &b"APR Boost".to_string()), 1);
         assert!(vec_map::get(attrs, &b"APR Boost".to_string()) == &b"+2%".to_string(), 2);
         assert!(vec_map::contains(attrs, &b"staking_apr_boost".to_string()), 3);
 
-        ts::return_to_sender(&scenario, nft);
+        ts::return_to_sender(&scenario, personal_cap);
+        ts::return_shared(kiosk);
     };
 
     ts::end(scenario);
@@ -174,24 +186,29 @@ fun test_nft_utility() {
 
     create_collection_cap_for_testing(&mut scenario);
 
+    let nft_id;
     ts::next_tx(&mut scenario, ADMIN);
     {
         let mut cap = ts::take_from_sender<CollectionCap>(&scenario);
-        og_nft::mint(&mut cap, USER1, ts::ctx(&mut scenario));
+        nft_id = og_nft::mint(&mut cap, USER1, ts::ctx(&mut scenario));
         ts::return_to_sender(&scenario, cap);
     };
 
     ts::next_tx(&mut scenario, USER1);
     {
-        let nft = ts::take_from_sender<OGNFT>(&scenario);
-        let attrs = og_nft::get_attributes(&nft);
+        let kiosk = ts::take_shared<Kiosk>(&scenario);
+        let personal_cap = ts::take_from_sender<PersonalKioskCap>(&scenario);
+        let cap_ref = personal_kiosk::borrow(&personal_cap);
+        let nft = sui::kiosk::borrow<OGNFT>(&kiosk, cap_ref, nft_id);
+        let attrs = og_nft::get_attributes(nft);
 
         assert!(vec_map::get(attrs, &b"staking_apr_boost".to_string()) == &b"2%".to_string(), 0);
         assert!(vec_map::get(attrs, &b"stackable".to_string()) == &b"false".to_string(), 1);
         assert!(vec_map::get(attrs, &b"boost_scope".to_string()) == &b"per_wallet".to_string(), 2);
         assert!(vec_map::get(attrs, &b"applies_while_held".to_string()) == &b"false".to_string(), 3);
 
-        ts::return_to_sender(&scenario, nft);
+        ts::return_to_sender(&scenario, personal_cap);
+        ts::return_shared(kiosk);
     };
 
     ts::end(scenario);
