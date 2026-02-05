@@ -111,7 +111,6 @@ public fun mint(
     vec_map::insert(&mut attributes, b"Transferability".to_string(), b"Transferable".to_string());
     vec_map::insert(&mut attributes, b"Version".to_string(), b"V1".to_string());
 
-    // Merged utility data (4 entries)
     vec_map::insert(&mut attributes, b"staking_apr_boost".to_string(), b"2%".to_string());
     vec_map::insert(&mut attributes, b"stackable".to_string(), b"false".to_string());
     vec_map::insert(&mut attributes, b"boost_scope".to_string(), b"per_wallet".to_string());
@@ -131,6 +130,7 @@ public fun mint(
 
     let (mut kiosk, kiosk_cap) = kiosk::new(ctx);
     kiosk::place(&mut kiosk, &kiosk_cap, nft);
+    kiosk::lock<OG_NFT>(&mut kiosk, &kiosk_cap, nft_id);
     personal_kiosk::create_for(&mut kiosk, kiosk_cap, receiver, ctx);
 
     event::emit(OGNFTMinted {
