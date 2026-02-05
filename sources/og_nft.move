@@ -201,6 +201,15 @@ public fun create_collection_cap_with_supply_for_testing(supply: u64, ctx: &mut 
     }
 }
 
+#[test_only]
+public fun create_transfer_policy_for_testing(ctx: &mut TxContext): TransferPolicy<OGNFT> {
+    let publisher = package::test_claim(OG_NFT {}, ctx);
+    let (transfer_policy, policy_cap) = transfer_policy::new<OGNFT>(&publisher, ctx);
+    transfer::public_transfer(publisher, ctx.sender());
+    transfer::public_transfer(policy_cap, ctx.sender());
+    transfer_policy
+}
+
 // ============== Getter Functions ==============
 public fun get_owner(cap: &CollectionCap): address {
     cap.roles.owner()
