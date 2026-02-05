@@ -6,7 +6,7 @@ use sui::display;
 use sui::event;
 use og_nft::og_nft_roles;
 use sui::vec_map::{Self, VecMap};
-use sui::transfer_policy;
+use sui::transfer_policy::{Self, TransferPolicy};
 use sui::kiosk::{Self};
 use kiosk::personal_kiosk;
 use kiosk::kiosk_lock_rule;
@@ -95,6 +95,7 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
 
 public fun mint(
     self: &mut CollectionCap,
+    transfer_policy: &TransferPolicy<OGNFT>,
     receiver: address,
     ctx: &mut TxContext
 ): ID {
@@ -129,8 +130,7 @@ public fun mint(
     self.minted = self.minted + 1;
 
     let (mut kiosk, kiosk_cap) = kiosk::new(ctx);
-    kiosk::place(&mut kiosk, &kiosk_cap, nft);
-    kiosk::lock<OG_NFT>(&mut kiosk, &kiosk_cap, nft_id);
+    kiosk::lock<OGNFT>(&mut kiosk, &kiosk_cap, transfer_policy, nft);
     personal_kiosk::create_for(&mut kiosk, kiosk_cap, receiver, ctx);
 
     event::emit(OGNFTMinted {
