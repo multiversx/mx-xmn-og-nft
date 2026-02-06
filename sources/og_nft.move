@@ -6,7 +6,8 @@ use sui::display;
 use sui::event;
 use og_nft::og_nft_roles;
 use sui::vec_map::{Self, VecMap};
-use sui::transfer_policy::{Self, TransferPolicy};
+use sui::transfer_policy::{Self, TransferPolicy, TransferPolicyCap};
+use sui::package::Publisher;
 use sui::kiosk::{Self};
 use kiosk::personal_kiosk;
 use kiosk::kiosk_lock_rule;
@@ -167,6 +168,16 @@ public fun accept_ownership(self: &mut CollectionCap, ctx: &TxContext) {
     self.roles.owner_role_mut().accept_role(ctx)
 }
 
+#[allow(lint(self_transfer))]
+public fun create_private_transfer_policy(
+    publisher: &Publisher,
+    ctx: &mut TxContext
+){
+    let (private_transfer_policy, transfer_policy_cap) = transfer_policy::new<OGNFT>(publisher, ctx);
+    transfer::public_transfer(private_transfer_policy, ctx.sender());
+    transfer::public_transfer(transfer_policy_cap, ctx.sender());
+}
+
 #[test_only]
 public fun create_for_testing(ctx: &mut TxContext): OGNFT {
     OGNFT {
@@ -242,4 +253,3 @@ public fun get_image_url(nft: &OGNFT): String {
 public fun get_attributes(nft: &OGNFT): &VecMap<String, String> {
     &nft.attributes
 }
-
