@@ -6,7 +6,7 @@ use sui::display;
 use sui::event;
 use og_nft::og_nft_roles;
 use sui::vec_map::{Self, VecMap};
-use sui::transfer_policy::{Self, TransferPolicy, TransferPolicyCap};
+use sui::transfer_policy::{Self, TransferPolicy};
 use sui::package::Publisher;
 use sui::kiosk::{Self};
 use kiosk::personal_kiosk;
