@@ -170,9 +170,11 @@ public fun accept_ownership(self: &mut CollectionCap, ctx: &TxContext) {
 
 #[allow(lint(self_transfer))]
 public fun create_private_transfer_policy(
+    self: &mut CollectionCap,
     publisher: &Publisher,
     ctx: &mut TxContext
 ){
+    assert!(ctx.sender() == self.roles.owner(), ENotOwner);
     let (private_transfer_policy, transfer_policy_cap) = transfer_policy::new<OGNFT>(publisher, ctx);
     transfer::public_transfer(private_transfer_policy, ctx.sender());
     transfer::public_transfer(transfer_policy_cap, ctx.sender());
