@@ -5,6 +5,13 @@ use sui::package;
 use sui::display;
 use sui::event;
 use og_nft::og_nft_roles;
+use sui::vec_map::{Self, VecMap};
+use sui::transfer_policy::{Self, TransferPolicy};
+use sui::package::Publisher;
+use sui::kiosk::{Self};
+use kiosk::personal_kiosk;
+use kiosk::kiosk_lock_rule;
+use kiosk::royalty_rule;
 
 // ============== Constants ==============
 const MINT_SUPPLY: u64 = 1000;
@@ -15,26 +22,13 @@ const ESupplyExceeded: u64 = 2;
 const EInvalidSupply: u64 = 3;
 
 // ============== Structs ==============
-public struct Utility has store, copy, drop {
-    staking_apr_boost: String,
-    stackable: bool,
-    boost_scope: String,
-    applies_while_held: bool,
-}
-
-public struct Attribute has store, copy, drop {
-    trait_type: String,
-    value: String,
-}
-
 public struct OGNFT has key, store {
     id: UID,
     name: String,
     symbol: String,
     image_url: String,
     description: String,
-    attributes: vector<Attribute>,
-    utility: Utility,
+    attributes: VecMap<String, String>,
 }
 
 public struct OG_NFT has drop {}
@@ -52,6 +46,7 @@ public struct OGNFTMinted has copy, drop {
     owner: address,
 }
 
+#[allow(lint(share_owned))]
 fun init(otw: OG_NFT, ctx: &mut TxContext) {
     let publisher = package::claim(otw, ctx);
     let roles = og_nft_roles::new<OG_NFT>(ctx.sender(), ctx);
@@ -62,72 +57,91 @@ fun init(otw: OG_NFT, ctx: &mut TxContext) {
         b"project_url".to_string(),
         b"description".to_string(),
         b"creator".to_string(),
+        b"collection_name".to_string(),
+        b"collection_description".to_string(),
+        b"collection_media_url".to_string(),
     ];
     let values = vector[
         b"{name}".to_string(),
-        b"https://stake.xmoney.com".to_string(),
         b"{image_url}".to_string(),
+        b"https://stake.xmoney.com".to_string(),
         b"{description}".to_string(),
         b"XMoney Team".to_string(),
+        b"XMN APR Boost Collection".to_string(),
+        b"Official XMoney NFT collection providing permanent staking APR boosts for XMN token holders. Each NFT grants +2% APR when staked in the XMoney protocol.".to_string(),
+        b"https://ipfs.io/ipfs/bafybeifhunxvdl2lylrly2kjpqwchjtyqyyakpstkgsqi7cr6a367jbkfe".to_string(),
     ];
 
     let mut display_obj = display::new_with_fields<OGNFT>(&publisher, keys, values, ctx);
     display_obj.update_version();
 
+    let (mut transfer_policy, policy_cap) = transfer_policy::new<OGNFT>(&publisher, ctx);
+
+    kiosk_lock_rule::add(&mut transfer_policy, &policy_cap);
+    royalty_rule::add(&mut transfer_policy, &policy_cap, 500, 0);
+
     let cap = CollectionCap {
         id: object::new(ctx),
         roles,
-        total_supply: MINT_SUPPLY,        
+        total_supply: MINT_SUPPLY,
         minted: 0
     };
 
     transfer::public_transfer(publisher, ctx.sender());
     transfer::public_transfer(display_obj, ctx.sender());
+    transfer::public_share_object(transfer_policy);
+    transfer::public_transfer(policy_cap, ctx.sender());
     transfer::public_transfer(cap, ctx.sender());
 }
 
 public fun mint(
     self: &mut CollectionCap,
+    transfer_policy: &TransferPolicy<OGNFT>,
     receiver: address,
     ctx: &mut TxContext
-) {
+): ID {
     assert!(ctx.sender() == self.roles.owner(), ENotOwner);
     assert!(self.minted < self.total_supply, ESupplyExceeded);
 
-    let mut attributes = vector::empty<Attribute>();
-    vector::push_back(&mut attributes, Attribute { trait_type: b"APR Boost".to_string(), value: b"+2%".to_string() });
-    vector::push_back(&mut attributes, Attribute { trait_type: b"Utility".to_string(), value: b"Staking Boost".to_string() });
-    vector::push_back(&mut attributes, Attribute { trait_type: b"Token".to_string(), value: b"XMN".to_string() });
-    vector::push_back(&mut attributes, Attribute { trait_type: b"Network".to_string(), value: b"Sui".to_string() });
-    vector::push_back(&mut attributes, Attribute { trait_type: b"Boost Type".to_string(), value: b"Permanent While Staked".to_string() });
-    vector::push_back(&mut attributes, Attribute { trait_type: b"Transferability".to_string(), value: b"Transferable".to_string() });
-    vector::push_back(&mut attributes, Attribute { trait_type: b"Version".to_string(), value: b"V1".to_string() });
+    let mut attributes = vec_map::empty<String, String>();
 
-    let utility_data = Utility {
-        staking_apr_boost: b"2%".to_string(),
-        stackable: false,
-        boost_scope: b"per_wallet".to_string(),
-        applies_while_held: false 
-    };
+    vec_map::insert(&mut attributes, b"APR Boost".to_string(), b"+2%".to_string());
+    vec_map::insert(&mut attributes, b"Utility".to_string(), b"Staking Boost".to_string());
+    vec_map::insert(&mut attributes, b"Token".to_string(), b"XMN".to_string());
+    vec_map::insert(&mut attributes, b"Network".to_string(), b"Sui".to_string());
+    vec_map::insert(&mut attributes, b"Boost Type".to_string(), b"Permanent While Staked".to_string());
+    vec_map::insert(&mut attributes, b"Transferability".to_string(), b"Transferable".to_string());
+    vec_map::insert(&mut attributes, b"Version".to_string(), b"V1".to_string());
+
+    vec_map::insert(&mut attributes, b"staking_apr_boost".to_string(), b"2%".to_string());
+    vec_map::insert(&mut attributes, b"stackable".to_string(), b"false".to_string());
+    vec_map::insert(&mut attributes, b"boost_scope".to_string(), b"per_wallet".to_string());
+    vec_map::insert(&mut attributes, b"applies_while_held".to_string(), b"false".to_string());
 
     let nft = OGNFT {
         id: object::new(ctx),
         name: b"XMN APR Boost NFT".to_string(),
         symbol: b"XMNBOOST".to_string(),
         description: b"The XMN APR Boost NFT grants its holder a permanent +2% APR increase on XMN staking rewards. Designed for long-term supporters of the XMN ecosystem, this NFT unlocks enhanced staking yields and exclusive benefits across the protocol.".to_string(),
-        image_url: b"https://ipfs.io/ipfs/bafybeifhunxvdl2lylrly2kjpqwchjtyqyyakpstkgsqi7cr6a367jbkfe".to_string(), 
+        image_url: b"https://ipfs.io/ipfs/bafybeifhunxvdl2lylrly2kjpqwchjtyqyyakpstkgsqi7cr6a367jbkfe".to_string(),
         attributes: attributes,
-        utility: utility_data,
     };
 
+    let nft_id = object::id(&nft);
     self.minted = self.minted + 1;
 
+    let (mut kiosk, kiosk_cap) = kiosk::new(ctx);
+    kiosk::lock<OGNFT>(&mut kiosk, &kiosk_cap, transfer_policy, nft);
+    personal_kiosk::create_for(&mut kiosk, kiosk_cap, receiver, ctx);
+
     event::emit(OGNFTMinted {
-        object_id: object::id(&nft),
+        object_id: nft_id,
         owner: receiver,
     });
 
-    transfer::public_transfer<OGNFT>(nft, receiver);
+    transfer::public_share_object(kiosk);
+
+    nft_id
 }
 
 public fun set_total_supply(
@@ -154,6 +168,16 @@ public fun accept_ownership(self: &mut CollectionCap, ctx: &TxContext) {
     self.roles.owner_role_mut().accept_role(ctx)
 }
 
+#[allow(lint(self_transfer))]
+public fun create_private_transfer_policy(
+    publisher: &Publisher,
+    ctx: &mut TxContext
+){
+    let (private_transfer_policy, transfer_policy_cap) = transfer_policy::new<OGNFT>(publisher, ctx);
+    transfer::public_transfer(private_transfer_policy, ctx.sender());
+    transfer::public_transfer(transfer_policy_cap, ctx.sender());
+}
+
 #[test_only]
 public fun create_for_testing(ctx: &mut TxContext): OGNFT {
     OGNFT {
@@ -162,13 +186,7 @@ public fun create_for_testing(ctx: &mut TxContext): OGNFT {
         image_url: b"https://test.com/nft.png".to_string(),
         description: b"Test NFT for unit testing".to_string(),
         symbol: b"TEST".to_string(),
-        attributes: vector::empty<Attribute>(),
-        utility: Utility {
-            staking_apr_boost: b"0%".to_string(),
-            stackable: false,
-            boost_scope: b"none".to_string(),
-            applies_while_held: false,
-        },  
+        attributes: vec_map::empty<String, String>(),
     }
 }
 
@@ -192,6 +210,15 @@ public fun create_collection_cap_with_supply_for_testing(supply: u64, ctx: &mut 
         total_supply: supply,
         minted: 0,
     }
+}
+
+#[test_only]
+public fun create_transfer_policy_for_testing(ctx: &mut TxContext): TransferPolicy<OGNFT> {
+    let publisher = package::test_claim(OG_NFT {}, ctx);
+    let (transfer_policy, policy_cap) = transfer_policy::new<OGNFT>(&publisher, ctx);
+    transfer::public_transfer(publisher, ctx.sender());
+    transfer::public_transfer(policy_cap, ctx.sender());
+    transfer_policy
 }
 
 // ============== Getter Functions ==============
@@ -223,26 +250,6 @@ public fun get_image_url(nft: &OGNFT): String {
     nft.image_url
 }
 
-public fun get_attributes(nft: &OGNFT): vector<Attribute> {
-    nft.attributes
-}
-
-public fun get_utility(nft: &OGNFT): Utility {
-    nft.utility
-}
-
-public fun get_staking_apr_boost(utility: &Utility): String {
-    utility.staking_apr_boost
-}
-
-public fun is_stackable(utility: &Utility): bool {
-    utility.stackable
-}
-
-public fun get_boost_scope(utility: &Utility): String {
-    utility.boost_scope
-}
-
-public fun applies_while_held(utility: &Utility): bool {
-    utility.applies_while_held
+public fun get_attributes(nft: &OGNFT): &VecMap<String, String> {
+    &nft.attributes
 }
