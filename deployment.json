@@ -57,7 +57,7 @@
       {
         "type": "bridgeOGNFT",
         "id": 4,
-        "active": true,
+        "active": false,
         "digest": "AYuxkEqoVz3karGfxaZoCp1NLV3KonX2zJUZu93qeNuw",
         "createdAt": "2025-12-17T11:33:57.368Z",
         "Package": "0x87e9466fdc54071410ad1b079b153cfe6de2e24c7916412cb718e3dbf767ebb2",
@@ -75,21 +75,44 @@
       },
       {
         "type": "bridgeOGNFT",
-        "id": 5,
+        "id": 6,
         "active": false,
-        "digest": "DWbB2uh3XZ8FY7QPKBwjVch1LrJU5RKDuXGdJSrc8hDg",
-        "createdAt": "2025-12-17T11:39:52.849Z",
-        "Package": "0x2638eec333f017e78da38388cb32cd37cb8820c7683177317f8b9b96b3069573",
-        "OGNFT_type": "0x2638eec333f017e78da38388cb32cd37cb8820c7683177317f8b9b96b3069573::og_nft::OGNFT",
+        "digest": "HA8Q4bJac8yUsHPtvMmgs4Sh28XkiR1GtgQwLzzQdNRi",
+        "createdAt": "2026-02-05T17:02:44.878Z",
+        "Package": "0x921f65073e1c8875b55648acef846ede8e0d19c19a49984bef0dda81f3585f81",
+        "OGNFT_type": "0x921f65073e1c8875b55648acef846ede8e0d19c19a49984bef0dda81f3585f81::og_nft::OGNFT",
         "Objects": {
-          "Display": "0x24c53f2d649df106abb7b17e2d06246349c037a962f7e93a97d04bda14560a4b",
-          "Publisher": "0x2ba3475673aaec909b24d9b1647270e774e11e14c6a46e4624106c121dbf16be",
-          "Field": "0xbfa3ab7508e65488b35601c938209fedddbd6c4c88b38807e409496d3e4bb958",
-          "CollectionCap": "0xc21b7debb47e7446e86321b663c8950d55847a26e1ca8e07ebd1eda49eca3b2f",
-          "UpgradeCap": "0xc5e0fe7469c0ae4483d121298e8b11f5dacb057211fe587d35375966c38a4637"
+          "UpgradeCap": "0x0271d9a674b489f7bc9d3c48a2a4a47ec9a3b78cd826cec4296f5ae2aa9319f5",
+          "Field": "0xb2ce4151aa59ac5b6bd503a3327ccbf6a0aee5f1e3df15df36ba1d4d309b8c84",
+          "Display": "0x3d382d01619aa5d19a09046a36e48c0c86ca17a00a6f78ef630c7e0e4eab8fd7",
+          "CollectionCap": "0x719b8229a12b96bd63a906c60fcebeeff6493195e878f0dbc262a6b871f77d48",
+          "TransferPolicy": "0x7db6115139ad5af5a74417b50082ecd2e4645e8e4ed46a449162f1d936a2d861",
+          "TransferPolicyCap": "0xa1c461b56a9ad1cae6419641c827d11329901c0d95c364f985c70ff6be61ffda",
+          "Publisher": "0xa6585e242839ce0343b450aa90bb9a0465570afb5bd1a49a5b2f9a7a4d063143"
         },
         "Operators": {
-          "Admin": "0xde91225b70964422bbaea44f2b77bf76e962eb7b1607039783bd2af31e96ce74"
+          "Admin": "0xeb298a01aef58dce189dbb7d5aa53ea934a14067568ade05b152ab5a8be7df4e"
+        }
+      },
+      {
+        "type": "bridgeOGNFT",
+        "id": 7,
+        "active": true,
+        "digest": "8gFyzYTvQf4i4FZSxRZibea264zopzs61ic5x2SLC6j3",
+        "createdAt": "2026-03-25T18:42:22.164Z",
+        "Package": "0xe67e7d8f1d27340b64b65df888e0d720f8495294ec56fdf6e3dfee4365b2a788",
+        "OGNFT_type": "0xe67e7d8f1d27340b64b65df888e0d720f8495294ec56fdf6e3dfee4365b2a788::og_nft::OGNFT",
+        "Objects": {
+          "UpgradeCap": "0x1b4f271f9b7e28473003b4565060883144b2fad440242ca53dd36d145c9795b7",
+          "Field": "0x81dc3cc6e3e80b7e502e670f711b614fc85e6039a43fc53bd8678100842725b1",
+          "CollectionCap": "0x2af6e94ac0a33d7b7c68353dcacab4bb5e8518c1fc79c78010d9cfded4ab0993",
+          "Publisher": "0x4a219c510e57dcd6e6dff92af50162d032bde2c95ac850dfda79dfcc66afeaab",
+          "TransferPolicy": "0x6d0f849e51ae7a87a11dd6b06398863bc637014d69bb1c90adc9111ba75f1fd4",
+          "TransferPolicyCap": "0xa45af141aa556166a2bbbb979487341c333c3d6152beab5e2bfc824a1d81bf0e",
+          "Display": "0xd939d181d88a548a94a68566eafe5078f3a5b2d5a8db9754776deda69a43174c"
+        },
+        "Operators": {
+          "Admin": "0xeb298a01aef58dce189dbb7d5aa53ea934a14067568ade05b152ab5a8be7df4e"
         }
       }
     ]
