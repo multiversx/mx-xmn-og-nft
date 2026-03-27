@@ -5,12 +5,13 @@ import {
   writeJSONFile,
 } from "../mx-bridge-typescript/src/utils/json";
 import { ENV } from "@/env";
+import { run } from "./runner";
 
 /**
  * Mark a specific deployment as active/official for the current network
  * Usage: DEPLOYMENT_ID=2 npx tsx scripts/mark-active.ts
  */
-async function main() {
+run(async () => {
   const deploymentId = parseInt(process.env.DEPLOYMENT_ID || "0", 10);
   const network = ENV.DEPLOY_ON;
 
@@ -66,11 +67,4 @@ async function main() {
   console.log(
     `Scripts using DEPLOYMENT_ID=active will now use this deployment.\n`
   );
-}
-
-if (require.main === module) {
-  main().catch((error) => {
-    console.error("Error:", error);
-    process.exit(1);
-  });
-}
+});

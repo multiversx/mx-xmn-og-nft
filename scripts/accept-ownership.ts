@@ -1,6 +1,7 @@
 import { ADMIN, DEPLOYMENT, ENV, SUI_CLIENT } from "@/env";
+import { run } from "./runner";
 
-async function main() {
+run(async () => {
   const deployerAddress = ADMIN.getPublicKey().toSuiAddress();
   console.log(`Accepting ownership as: ${deployerAddress}`);
 
@@ -34,11 +35,4 @@ async function main() {
     console.log("Run: npx tsx scripts/transfer-ownership.ts");
     process.exit(1);
   }
-}
-
-if (require.main === module) {
-  main().catch((error) => {
-    console.error("Error:", error);
-    process.exit(1);
-  });
-}
+});

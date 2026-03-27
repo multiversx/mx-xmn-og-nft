@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs";
 import { execSync } from "child_process";
 import { ADMIN, SUI_CLIENT, ENV } from "@/env";
+import { run } from "./runner";
 
 import {
   sleep,
@@ -64,7 +65,7 @@ function updateMoveLock(
   console.log(`Updated Move.lock: fresh deployment, package ${packageId}`);
 }
 
-export async function main() {
+run(async () => {
   const deployerAddress = ADMIN.getPublicKey().toSuiAddress();
   console.log(`Deployer: ${deployerAddress}`);
 
@@ -149,11 +150,4 @@ export async function main() {
 
   console.log(`\nTo make this deployment active, run the following command:\n`);
   console.log(`DEPLOYMENT_ID=${deploymentId} npx tsx scripts/mark-active.ts\n`);
-}
-
-if (require.main === module) {
-  main().catch((error) => {
-    console.error("Error:", error);
-    process.exit(1);
-  });
-}
+});
